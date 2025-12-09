@@ -1,0 +1,437 @@
+#include <stdio.h>
+#include <string.h>
+
+struct product {
+    int id;
+    char name[50];
+    float price;
+    int stock;
+    char category[20];
+};
+
+struct cartitem {
+    int productid;
+    float price;
+    int quantity;
+    char name[50];
+};
+
+struct customer {
+    char fullname[50];
+    char email[100];
+    char phonenumber[15];
+    char address[100];
+};
+
+struct product products[100];
+struct cartitem cart[100];
+struct customer customer;
+
+int productcount = 0;
+int cartcount = 0;
+float totalamount = 0.0;
+float delivercharges = 50.0;
+float taxpercentage = 0.15;
+
+void initiallixeprodcuts();
+void displaywelcome();
+void getcustomerinfo();
+void displaymenu();
+void displayitem();
+void addtocart();
+void viewcart();
+void checkout();
+void removefromcart();
+void clearcart();
+
+int main() {
+    initiallixeprodcuts();
+    displaywelcome();
+    getcustomerinfo();
+
+    int choice;
+
+    do {
+        displaymenu();
+        printf("\n enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                displayitem();
+                addtocart();
+                break;
+
+            case 2:
+                viewcart();
+                break;
+
+            case 3:
+                checkout();
+                break;
+
+            case 4:
+                printf("\n exiting...");
+                break;
+
+            default:
+                printf("\n invalid choice");
+        }
+    } while (choice != 4);
+
+    return 0;
+}
+
+void initiallixeprodcuts() {
+
+    products[0].id = 1;
+    strcpy(products[0].name, "Apple");
+    products[0].price = 120.0;
+    products[0].stock = 50;
+    strcpy(products[0].category, "Fruits");
+
+    products[1].id = 2;
+    strcpy(products[1].name, "Banana");
+    products[1].price = 60.0;
+    products[1].stock = 100;
+    strcpy(products[1].category, "Fruits");
+
+    products[2].id = 3;
+    strcpy(products[2].name, "Orange");
+    products[2].price = 80.0;
+    products[2].stock = 75;
+    strcpy(products[2].category, "Fruits");
+
+    products[3].id = 4;
+    strcpy(products[3].name, "Potato");
+    products[3].price = 40.0;
+    products[3].stock = 200;
+    strcpy(products[3].category, "Vegetables");
+
+    products[4].id = 5;
+    strcpy(products[4].name, "Tomato");
+    products[4].price = 50.0;
+    products[4].stock = 150;
+    strcpy(products[4].category, "Vegetables");
+
+    products[5].id = 6;
+    strcpy(products[5].name, "Onion");
+    products[5].price = 45.0;
+    products[5].stock = 180;
+    strcpy(products[5].category, "Vegetables");
+
+    products[6].id = 7;
+    strcpy(products[6].name, "Milk");
+    products[6].price = 60.0;
+    products[6].stock = 100;
+    strcpy(products[6].category, "Dairy");
+
+    products[7].id = 8;
+    strcpy(products[7].name, "Eggs");
+    products[7].price = 120.0;
+    products[7].stock = 80;
+    strcpy(products[7].category, "Dairy");
+
+    productcount = 8;
+}
+
+void displaywelcome() {
+    printf("\n--------------------------------------");
+    printf("\n WELCOME TO ONLINE SUPERMARKET");
+    printf("\n--------------------------------------");
+}
+
+void getcustomerinfo() {
+    printf("\n please provide your information");
+
+    getchar();
+
+    printf("\n enter your full name: ");
+    fgets(customer.fullname, 50, stdin);
+
+    int i = 0;
+    while (customer.fullname[i] != '\n' && customer.fullname[i] != '\0') i++;
+    customer.fullname[i] = '\0';
+
+    printf("\n enter your email: ");
+    fgets(customer.email, 100, stdin);
+    i = 0;
+    while (customer.email[i] != '\n' && customer.email[i] != '\0') i++;
+    customer.email[i] = '\0';
+
+    printf("\n enter your phone number: ");
+    fgets(customer.phonenumber, 15, stdin);
+    i = 0;
+    while (customer.phonenumber[i] != '\n' && customer.phonenumber[i] != '\0') i++;
+    customer.phonenumber[i] = '\0';
+
+    printf("\n enter your delivery address: ");
+    fgets(customer.address, 100, stdin);
+    i = 0;
+    while (customer.address[i] != '\n' && customer.address[i] != '\0') i++;
+    customer.address[i] = '\0';
+
+    printf("\n Thank you. Your information has been saved.\n");
+}
+
+void displaymenu() {
+    printf("\n  MAIN MENU ");
+    printf("\n 1. view items & add to cart");
+    printf("\n 2. view cart");
+    printf("\n 3. checkout ");
+    printf("\n 4. exit");
+}
+
+void displayitem() {
+    int i;
+    printf("\n -------Available items-------");
+    printf("\nID  Name                 Category       Price(Rs)  Stock");
+
+    for (i = 0; i < productcount; i++) {
+        printf("\n %-3d %-20s %-15s %-10.2f %-8d",
+               products[i].id,
+               products[i].name,
+               products[i].category,
+               products[i].price,
+               products[i].stock);
+    }
+}
+
+void addtocart() {
+    int itemid, quantity;
+    char continueshopping;
+
+    do {
+        printf("\n enter item id to add to your cart: ");
+        scanf("%d", &itemid);
+
+        printf("\n enter quantity: ");
+        scanf("%d", &quantity);
+
+        int found = 0;
+        int i, j;
+
+        for (i = 0; i < productcount; i++) {
+            if (products[i].id == itemid) {
+                found = 1;
+
+                if (products[i].stock >= quantity) {
+
+                    int incart = 0;
+
+                    for (j = 0; j < cartcount; j++) {
+                        if (cart[j].productid == itemid) {
+                            cart[j].quantity += quantity;
+                            incart = 1;
+                            break;
+                        }
+                    }
+
+                    if (!incart) {
+                        cart[cartcount].productid = itemid;
+                        strcpy(cart[cartcount].name, products[i].name);
+                        cart[cartcount].price = products[i].price;
+                        cart[cartcount].quantity = quantity;
+                        cartcount++;
+                    }
+
+                    products[i].stock -= quantity;
+                    printf("\n item added to cart successfully");
+
+                } else {
+                    printf("\n Not enough stock available! Available: %d", products[i].stock);
+                }
+                break;
+            }
+        }
+
+        if (!found) {
+            printf("\n item not found");
+        }
+
+        printf("do you want to continue shopping (y/n): ");
+        scanf(" %c", &continueshopping);
+
+    } while (continueshopping == 'y' || continueshopping == 'Y');
+}
+
+void viewcart() {
+    if (cartcount == 0) {
+        printf("\n your cart is empty!");
+        return;
+    }
+
+    int i;
+    float carttotal = 0;
+
+    printf("\n ------- SHOPPING CART -------");
+    printf("\nID  Name                 Price      Qty      Total");
+
+    for (i = 0; i < cartcount; i++) {
+        float itemtotal = cart[i].price * cart[i].quantity;
+
+        printf("\n%-3d %-20s %-10.2f %-8d %-10.2f",
+               cart[i].productid,
+               cart[i].name,
+               cart[i].price,
+               cart[i].quantity,
+               itemtotal);
+
+        carttotal += itemtotal;
+    }
+
+    printf("\n cart total: %.2f", carttotal);
+
+    int choice;
+    printf("\n 1. remove item from your cart");
+    printf("\n 2. clear cart");
+    printf("\n 3. return to menu");
+    printf("\n enter your choice: ");
+    scanf("%d", &choice);
+
+    switch (choice) {
+        case 1:
+            removefromcart();
+            break;
+
+        case 2:
+            clearcart();
+            break;
+
+        case 3:
+            break;
+
+        default:
+            printf("\n invalid choice");
+    }
+}
+
+void removefromcart() {
+    if (cartcount == 0) {
+        printf("\n cart is already empty");
+        return;
+    }
+
+    int itemid;
+    printf("\n enter item id to remove: ");
+    scanf("%d", &itemid);
+
+    int found = 0;
+    int i, j;
+
+    for (i = 0; i < cartcount; i++) {
+        if (cart[i].productid == itemid) {
+            found = 1;
+
+            for (j = 0; j < productcount; j++) {
+                if (products[j].id == itemid) {
+                    products[j].stock += cart[i].quantity;
+                    break;
+                }
+            }
+
+            for (j = i; j < cartcount - 1; j++) {
+                cart[j] = cart[j + 1];
+            }
+
+            cartcount--;
+            printf("\n item removed from cart successfully");
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("\n item not found in cart");
+    }
+}
+
+void clearcart() {
+    int i, j;
+
+    for (i = 0; i < cartcount; i++) {
+        for (j = 0; j < productcount; j++) {
+            if (products[j].id == cart[i].productid) {
+                products[j].stock += cart[i].quantity;
+                break;
+            }
+        }
+    }
+
+    cartcount = 0;
+    printf("\n cart cleared successfully");
+}
+
+void checkout() {
+    if (cartcount == 0) {
+        printf("\n your cart is empty, please add items before checkout");
+        return;
+    }
+
+    float subtotal = 0;
+    int i;
+
+    for (i = 0; i < cartcount; i++) {
+        subtotal += cart[i].price * cart[i].quantity;
+    }
+
+    float tax = subtotal * taxpercentage;
+    totalamount = subtotal + tax + delivercharges;
+
+    printf("\n FINAL BILL:");
+    printf("\n customer information:");
+    printf("\n Name: %s", customer.fullname);
+    printf("\n Email: %s", customer.email);
+    printf("\n Phone: %s", customer.phonenumber);
+    printf("\n Address: %s", customer.address);
+
+    printf("\n order details:");
+    printf("\n Item                 Price      Qty      Total");
+
+    for (i = 0; i < cartcount; i++) {
+        float itemtotal = cart[i].price * cart[i].quantity;
+
+        printf("\n %-20s %-10.2f %-8d %-10.2f",
+               cart[i].name,
+               cart[i].price,
+               cart[i].quantity,
+               itemtotal);
+    }
+
+    printf("\n summary:");
+    printf("\n subtotal: Rs %.2f", subtotal);
+    printf("\n tax (15%%): Rs %.2f", tax);
+    printf("\n delivery charges: Rs %.2f", delivercharges);
+    printf("\n total amount: Rs %.2f", totalamount);
+
+    int paymentchoice;
+    printf("\n SELECT PAYMENT METHOD");
+    printf("\n 1. cash on delivery");
+    printf("\n 2. credit/debit card (POS)");
+    printf("\n enter your choice: ");
+    scanf("%d", &paymentchoice);
+
+    if (paymentchoice == 1) {
+        printf("\n Payment method: Cash on delivery");
+    } else if (paymentchoice == 2) {
+        printf("\n Payment method: Credit/Debit Card");
+    } else {
+        printf("\n Invalid payment method");
+        return;
+    }
+
+    char confirm;
+    printf("\n confirm order (y/n): ");
+    scanf(" %c", &confirm);
+
+    if (confirm == 'y' || confirm == 'Y') {
+        printf("\n ------------------------------------");
+        printf("\n THANK YOU FOR SHOPPING WITH US!");
+        printf("\n Your order will be delivered soon.");
+        printf("\n Total amount: Rs %.2f", totalamount);
+        printf("\n ------------------------------------");
+
+        cartcount = 0;
+    } else {
+        printf("\n Order cancelled.");
+    }
+}
